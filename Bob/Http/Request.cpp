@@ -10,6 +10,8 @@ Bob::Http::Request::Request(const char* Buffer) : _desserializer(Buffer) {}
 void Bob::Http::Request::DeserializeAll()
 {
 
+
+
 }
 
 

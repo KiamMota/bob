@@ -3,6 +3,7 @@
 
 #include "Enums.hpp"
 #include "Http/Deserializer.hpp"
+#include <cstdint>
 #include <string>
 
 namespace Bob {
@@ -14,15 +15,26 @@ namespace Http
     private:
     Bob::Http::Deserializer _desserializer;
     Bob::Http::HttpMethodEnum _method;
+    Bob::Http::ContentTypeEnum _contentType;
+    uint64_t _contentLength;
+    std::string _methodStr;
+    std::string _ContentTypeStr;
     std::string _route;
     std::string _httpVersion;
     std::string _host;
-    Bob::Http::ContentTypeEnum _ContentType;
-    long _ContentLength;
+      
+     
+
     public:
     Request(const std::string& Buffer);
     Request(const char* Buffer);
-    /* universal getter */
+    std::string Body();
+    std::string Method();
+    std::string Host();
+    std::string Version();
+    std::string Route();
+    std::string ContentType();
+    std::string ContentLength();
     void DeserializeAll(); 
 };
 }

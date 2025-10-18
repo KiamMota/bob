@@ -1,5 +1,6 @@
 #include "Deserializer.hpp"
 #include <cstring>
+#include <string>
 
 #define SPACE 1
 #define UNK "0"
@@ -91,4 +92,12 @@ std::string Bob::Http::Deserializer::DeseriaizeContentType()
     return "0";
   }
   return _allBuffer.substr(pos + strlen(CONTENT_TYPE));
+}
+
+std::string Bob::Http::Deserializer::DeserializeBody()
+{
+  auto pos = _allBuffer.find("\r\n\r\n");
+  if (pos != std::string::npos)
+    return _allBuffer.substr(pos + 4);
+  return UNK;
 }

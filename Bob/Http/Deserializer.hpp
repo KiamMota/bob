@@ -20,6 +20,7 @@ namespace Http
       std::string DeseriaizeContentType();
       std::string DeserializeContentLength();
       std::string DeserializeHost();
+      std::string DeserializeBody();
   };
 
 

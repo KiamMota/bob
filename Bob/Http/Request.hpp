@@ -31,7 +31,7 @@ namespace Http
     Request(const std::string& Buffer);
     Request(const char* Buffer);
     std::string Body();
-    std::string Method();
+    Http::HttpMethodEnum Method();
     std::string Host();
     std::string Version();
     std::string Route();

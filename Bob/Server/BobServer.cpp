@@ -148,8 +148,11 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
     };
 
     Http::Request req(buffer->base);
-
-
+    req.DeserializeAll();
+    if(req.Method() == Http::HttpMethodEnum::GET)
+  {
+    std::cout << "Foi um GET!" << std::endl;
+  }
     char* messageNotAllowed = strdup(self->_messageNotAllowed);
     responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
     uv_write(writer, client, &responseBuf, 1, WriteCb);

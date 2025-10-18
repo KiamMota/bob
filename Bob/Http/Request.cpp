@@ -17,6 +17,7 @@ void Bob::Http::Request::DeserializeAll()
   _route = _desserializer.DeserializeRoute();
   _httpVersion = _desserializer.DeserializeVersion();
   _ContentTypeStr = _desserializer.DeseriaizeContentType();
+  _contentType = _ContentTypeMapper();
   _contentLength = std::stoi(_desserializer.DeserializeContentLength());
   _host = _desserializer.DeserializeHost();
 }
@@ -50,9 +51,9 @@ std::string Bob::Http::Request::Body()
   return _body;
 }
 
-std::string Bob::Http::Request::Method()
+Bob::Http::HttpMethodEnum Bob::Http::Request::Method()
 {
-  return _route;
+  return _method;
 }
 
 std::string Bob::Http::Request::Route()

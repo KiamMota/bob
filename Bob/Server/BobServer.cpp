@@ -113,8 +113,6 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* server, ssize_t nread, const uv_b
             uv_close((uv_handle_t*)server, nullptr);
         return;
     }
-
-
     delete[] buffer->base;
 }
 

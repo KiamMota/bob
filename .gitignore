@@ -1,0 +1,58 @@
+# Compilação
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+
+# Builds e binários
+/build/
+bin/
+debug/
+release/
+dist/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+*.ninja
+*.ilk
+*.pdb
+*.idb
+*.exp
+*.manifest
+
+# Logs e temporários
+*.log
+*.tmp
+*.swp
+*.swo
+*.cache
+*.dSYM/
+*.stackdump
+*.core
+core.*
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+*.user
+*.sln
+*.vcxproj*
+*.xcodeproj/
+*.DS_Store
+
+# Testes e cobertura
+*.gcno
+*.gcda
+*.gcov
+coverage/
+

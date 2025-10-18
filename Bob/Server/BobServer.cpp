@@ -141,18 +141,7 @@ void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
         return;
     }
 
-    uv_timer_t* timeoutTimer = new uv_timer_t;
-    uv_timer_init(self->_mainLoop, timeoutTimer);
-    timeoutTimer->data = client_handle;
-
     uv_read_start((uv_stream_t*)client_handle, self->AllocBufferCb, self->ReadBufferCb);
 
-    uv_timer_start(timeoutTimer, [](uv_timer_t* t) {
-        uv_tcp_t* client = (uv_tcp_t*)t->data;
-        if (!uv_is_closing((uv_handle_t*)client))
-            uv_close((uv_handle_t*)client, nullptr);
-        std::cout << "* Timeout! Connection Closed By Server.  " << std::endl;
-        uv_close((uv_handle_t*)t, [](uv_handle_t* h){ delete (uv_timer_t*)h; });
-    }, self->_msTolerance, 0);
 }
 

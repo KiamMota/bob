@@ -62,9 +62,8 @@ namespace Bob
       Close = 1,
       KeepAlive,
       Upgrade,
-      ProxyConnection
+      ProxyConnection,
     };
-
 }
 }
 

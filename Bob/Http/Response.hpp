@@ -19,13 +19,14 @@ namespace Bob
         std::string _Code;
         void _StartHeaders();
         std::string _RawCodeToString();
+        bool haveContent;
       public:
   
         Response(int Code);
         Response(Bob::Http::HttpStatusEnum Code);
-        Response& SetContentType(ContentTypeEnum cType);
-        Response& SetConnection();
-        Response& SetCookie();
+        void SetContentType(ContentTypeEnum cType);
+        void SetConnection(HttpConnectionEnum connectionMode);
+        void SetCookie();
         const char* Send();  
     };
   }

@@ -6,7 +6,6 @@ namespace Bob
 {
   namespace Http
   {
-
     enum class HttpMethodEnum 
     {
       GET = 1,
@@ -57,6 +56,15 @@ namespace Bob
       ServiceUnavailable = 503,
       GatewayTimeout = 504
     };
+
+    enum class HttpConnectionEnum
+    {
+      Close = 1,
+      KeepAlive,
+      Upgrade,
+      ProxyConnection
+    };
+
 }
 }
 

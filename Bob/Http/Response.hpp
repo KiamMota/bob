@@ -23,8 +23,7 @@ namespace Bob
   
         Response(int Code);
         Response(Bob::Http::HttpStatusEnum Code);
-
-        Response& SetContentType();
+        Response& SetContentType(ContentTypeEnum cType);
         Response& SetConnection();
         Response& SetCookie();
         const char* Send();  

@@ -3,13 +3,13 @@
 #include <iostream>
 #include <string>
 
-Bob::Http::Response::Response(int Code) 
+Bob::Http::Response::Response(int Code) : _haveBody(false) 
 {
   _RawCode = (Bob::Http::HttpStatusEnum)Code;
   _StartHeaders();
 }
 
-Bob::Http::Response::Response(Bob::Http::HttpStatusEnum Code)  
+Bob::Http::Response::Response(Bob::Http::HttpStatusEnum Code) : _haveBody(false)  
 {
   _RawCode = Code;
   _StartHeaders();
@@ -106,19 +106,21 @@ std::string Bob::Http::Response::_RawCodeToString()
 
 void Bob::Http::Response::SetBody(std::string body)
 {
+  if(_haveBody) return;
+  _haveBody = true;
   _body = std::string(body);
+  _contentType = "Content-Length: " + std::to_string(_body.size());
 }
 
 std::string Bob::Http::Response::Send()
 {
   std::string allBuffer;
   allBuffer = _firstHeader;
-  allBuffer += _contentType;
   allBuffer += _connection;
+  allBuffer += _contentType;
   allBuffer += "Content-Length: " + std::to_string(_body.size()); 
   allBuffer += "\r\n\r\n";
   allBuffer += _body;
-  std::cout << "BUFFER:\r\n" << allBuffer << std::endl;
   return allBuffer;
 }
 

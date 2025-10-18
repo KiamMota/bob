@@ -25,7 +25,9 @@ namespace Bob
         std::string _contentType;
         std::string _connection;
         std::string _body;
-        
+        std::string _contentLength;
+        bool _haveBody;     
+
       public:
   
         Response(int Code);

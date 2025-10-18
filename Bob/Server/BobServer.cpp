@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstring>
 #include <cstdio>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <sys/socket.h>
@@ -125,13 +126,18 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* client, ssize_t nread, const uv_b
     delete[] buffer->base;
 }
 
+void Bob::BobServer::SetFallbackResponse(std::function<Http::Response(Http::Request&)> cb)
+{
+  calback = cb;
+}
+
 void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
 {
     /* inits the self object */
     BobServer* self = (BobServer*)client->data;
     std::cout << "* Sending Response" << std::endl;
+    /* allocating writer */
     uv_write_t* writer = new uv_write_t;
-    uv_buf_t responseBuf;
     
     if(!self)
     {
@@ -140,14 +146,14 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
       delete writer;
       return;
     };
-    Http::Response resp(Http::HttpStatusEnum::Accepted);
-    resp.SetConnection(Http::HttpConnectionEnum::Close);
-    resp.SetContentType(Http::ContentTypeEnum::ApplicationJson);
-    resp.SetBody("{ \"message\": \"hello, friends!\"}");
-    resp.Send();
-    
-    char* messageNotAllowed = strdup(self->_messageNotAllowed);
-    responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
+  
+    Http::Request req(buffer->base);
+    auto response = self->calback(req);
+    char* buffertoSend = strdup(response.Send().c_str());
+      
+    uv_buf_t responseBuf;
+    uv_buf_init(buffertoSend, strlen(buffertoSend));
+
     uv_write(writer, client, &responseBuf, 1, WriteCb);
     uv_close((uv_handle_t*)client, NULL);
 }

@@ -25,6 +25,8 @@ namespace Bob
 
       std::unordered_map<std::string /* route */, std::unordered_map<Http::HttpMethodEnum,
               std::function<Http::Response(Http::Request&)>>> _routeMap;   
+  
+      std::function<Http::Response(Http::Request&)> calback;
 
       const char* _messageNotAllowed;
 
@@ -46,7 +48,7 @@ namespace Bob
       int Run(); 
       
       BobServer& AddController(const char* route, Http::HttpMethodEnum Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback);
-      
+      void SetFallbackResponse(std::function<Http::Response(Http::Request&)> cb); 
       ushort GetPort();
       std::string GetIp();
       std::string GetEndpoint();

@@ -157,6 +157,7 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
       responseBuf = uv_buf_init(sendBuffer, strlen(sendBuffer));
       uv_write(writer, client, &responseBuf, 1, WriteCb);
       uv_close((uv_handle_t*)client, NULL);
+      delete sendBuffer;
       return;
     }
 
@@ -166,10 +167,10 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
     Http::Response response = self->_fallbackCallback(req);
     sendBuffer = strdup(response.Send().c_str());
     responseBuf = uv_buf_init(sendBuffer, strlen(sendBuffer));
-
     
     uv_write(writer, client, &responseBuf, 1, WriteCb);
     uv_close((uv_handle_t*)client, NULL);
+    delete sendBuffer;
 }
 
 

@@ -5,7 +5,7 @@
 
 Bob::Http::Response funcao(Bob::Http::Request& rq)
 {
-  std::cout << "corpo da funcao: " << rq.Body() << std::endl;
+  std::cout << "ola!" << std::endl;
   Bob::Http::Response resp(200);
   return resp;
 }
@@ -13,5 +13,7 @@ Bob::Http::Response funcao(Bob::Http::Request& rq)
 int main()
 {
   Bob::BobServer bob("127.0.0.1", 7192);
+  bob.SetFallbackResponse(funcao);
   bob.Run();
+
 }

@@ -11,6 +11,7 @@ set(BOB_SRC
   Bob/Server/BobServer.cpp
   Bob/Http/Request.cpp
   Bob/Http/Response.cpp
+  Bob/Http/Deserializer.cpp
 )
 
 add_library(bob ${BOB_SRC})

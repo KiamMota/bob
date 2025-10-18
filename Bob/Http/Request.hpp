@@ -18,7 +18,9 @@ namespace Http
     Bob::Http::ContentTypeEnum _contentType;
     uint64_t _contentLength;
     std::string _methodStr;
+    Bob::Http::HttpMethodEnum _MethodMapper();
     std::string _ContentTypeStr;
+    Bob::Http::ContentTypeEnum _ContentTypeMapper();
     std::string _route;
     std::string _httpVersion;
     std::string _host;

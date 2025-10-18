@@ -33,7 +33,7 @@ namespace Bob
       static void ReadBufferCb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buffer);
       static void WriteCb(uv_write_t* req, int status);    
       static void DefaultCallbackConnection(uv_stream_t* stream, int result);
-
+      static void SendResponse(uv_stream_t* client);
       void PrepareServer();
       void InfoListening();
       void InitLoop();

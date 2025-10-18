@@ -77,6 +77,7 @@ void Bob::BobServer::AllocBufferCb(uv_handle_t* handle, size_t suggested_size, u
       suggested_size = 1024;
       std::cout << "* Adjusted Size " << std::endl;
     }
+    std::cout << "Alocated Buffer" << std::endl;
     buffer->len = suggested_size;
     buffer->base = new char[buffer->len];
 }
@@ -89,42 +90,43 @@ Bob::BobServer& Bob::BobServer::SetIdleTimeout(int ms)
 
 void Bob::BobServer::WriteCb(uv_write_t* write, int status)
 {
-  if(status < 0) std::cout << "error in write:" << uv_strerror(status); 
+  if(status < 0) std::cout << "error:" << uv_strerror(status); 
   delete write;
 }
 
-void Bob::BobServer::ReadBufferCb(uv_stream_t* server, ssize_t nread, const uv_buf_t* buffer) {
+void Bob::BobServer::ReadBufferCb(uv_stream_t* client, ssize_t nread, const uv_buf_t* buffer) {
     
-    BobServer* self = (BobServer*)server->data;
-    std::cout << "* Reading Data..." << std::endl;  
-    if(!self)
+    if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)client))
     {
-      std::cout << "Failed To Alocate self in stream->data" << std::endl;
-      delete[] buffer->base;
-      return;
-    };
-
-    if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)server))
-    {
-      uv_close((uv_handle_t*)server, nullptr);
+      uv_close((uv_handle_t*)client, nullptr);
       delete[] buffer->base;
       return;
     }
 
-    uv_write_t* writer = new uv_write_t;
-    uv_buf_t responseBuf;
-    
-    char* messageNotAllowed = strdup(self->_messageNotAllowed);
-    
-    responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
-    
-    uv_write(writer, server, &responseBuf, 1, WriteCb);
-    
-    uv_close((uv_handle_t*)server, NULL);
-    
+    std::cout << "* Received Data" << std::endl;
+
+    SendResponse(client);  
     delete[] buffer->base;
 }
 
+void Bob::BobServer::SendResponse(uv_stream_t* client)
+{
+    BobServer* self = (BobServer*)client->data;
+    std::cout << "* Sending Response" << std::endl;
+    uv_write_t* writer = new uv_write_t;
+    uv_buf_t responseBuf;
+    
+    if(!self)
+    {
+      std::cout << "Failed To Alocate self in stream->data" << std::endl;
+      return;
+    };
+
+    char* messageNotAllowed = strdup(self->_messageNotAllowed);
+    responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
+    uv_write(writer, client, &responseBuf, 1, WriteCb);
+    uv_close((uv_handle_t*)client, NULL);
+}
 
 void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
 {
@@ -140,7 +142,7 @@ void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
         uv_close((uv_handle_t*)client_handle, [](uv_handle_t* h){ delete (uv_tcp_t*)h; });
         return;
     }
-
+    
     uv_read_start((uv_stream_t*)client_handle, self->AllocBufferCb, self->ReadBufferCb);
 
 }

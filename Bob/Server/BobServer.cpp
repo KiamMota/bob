@@ -128,7 +128,7 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* client, ssize_t nread, const uv_b
 
 void Bob::BobServer::SetFallbackResponse(std::function<Http::Response(Http::Request&)> cb)
 {
-  calback = cb;
+  _fallbackCallback = cb;
 }
 
 void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
@@ -147,13 +147,27 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
       return;
     };
   
-    Http::Request req(buffer->base);
-    auto response = self->calback(req);
-    char* buffertoSend = strdup(response.Send().c_str());
-      
     uv_buf_t responseBuf;
-    uv_buf_init(buffertoSend, strlen(buffertoSend));
+    char* sendBuffer;
 
+    if(!self->_fallbackCallback)
+    {
+      std::cout << "* Fallback Not Set : Using 405 Method Not Allowed" << std::endl;
+      sendBuffer = strdup(self->_messageNotAllowed);
+      responseBuf = uv_buf_init(sendBuffer, strlen(sendBuffer));
+      uv_write(writer, client, &responseBuf, 1, WriteCb);
+      uv_close((uv_handle_t*)client, NULL);
+      return;
+    }
+
+    /* transform the client buffer in a request object */
+    Http::Request req(buffer->base);
+    /* Get response from callback */ 
+    Http::Response response = self->_fallbackCallback(req);
+    sendBuffer = strdup(response.Send().c_str());
+    responseBuf = uv_buf_init(sendBuffer, strlen(sendBuffer));
+
+    
     uv_write(writer, client, &responseBuf, 1, WriteCb);
     uv_close((uv_handle_t*)client, NULL);
 }

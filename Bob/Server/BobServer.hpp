@@ -26,7 +26,7 @@ namespace Bob
       std::unordered_map<std::string /* route */, std::unordered_map<Http::HttpMethodEnum,
               std::function<Http::Response(Http::Request&)>>> _routeMap;   
   
-      std::function<Http::Response(Http::Request&)> calback;
+      std::function<Http::Response(Http::Request&)> _fallbackCallback;
 
       const char* _messageNotAllowed;
 

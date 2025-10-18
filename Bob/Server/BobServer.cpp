@@ -140,7 +140,12 @@ void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
       delete writer;
       return;
     };
-
+    Http::Response resp(Http::HttpStatusEnum::Accepted);
+    resp.SetConnection(Http::HttpConnectionEnum::Close);
+    resp.SetContentType(Http::ContentTypeEnum::ApplicationJson);
+    resp.SetBody("{ \"message\": \"hello, friends!\"}");
+    resp.Send();
+    
     char* messageNotAllowed = strdup(self->_messageNotAllowed);
     responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
     uv_write(writer, client, &responseBuf, 1, WriteCb);

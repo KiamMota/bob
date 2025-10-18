@@ -11,6 +11,5 @@ Bob::Http::Response funcao(Bob::Http::Request& rq)
 int main()
 {
   Bob::BobServer bob("127.0.0.1", 7192);
-  bob.SetIdleTimeout(4000);
   bob.Run();
 }

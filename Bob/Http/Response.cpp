@@ -1,21 +1,24 @@
 #include "Response.hpp"
 #include "Http/Enums.hpp"
+#include <iostream>
+#include <string>
 
-Bob::Http::Response::Response(int Code) : haveContent(false)
+Bob::Http::Response::Response(int Code) 
 {
   _RawCode = (Bob::Http::HttpStatusEnum)Code;
+  _StartHeaders();
 }
 
-Bob::Http::Response::Response(Bob::Http::HttpStatusEnum Code) : haveContent(false)
+Bob::Http::Response::Response(Bob::Http::HttpStatusEnum Code)  
 {
   _RawCode = Code;
+  _StartHeaders();
 }
 
 void Bob::Http::Response::_StartHeaders()
 {
-  _Code = _RawCodeToString();
-  _Buf << "HTTP/1.1" + _Code + "\r\n";
-  _Buf << "Server: Bob\r\n";
+  _firstHeader = "HTTP/1.1 " + _RawCodeToString() + "\r\n";
+  _firstHeader += "Server: Bob\r\n";
 }
 
 void Bob::Http::Response::SetConnection(Bob::Http::HttpConnectionEnum connectionMode)
@@ -23,16 +26,16 @@ void Bob::Http::Response::SetConnection(Bob::Http::HttpConnectionEnum connection
     switch(connectionMode)
     {
         case Http::HttpConnectionEnum::Close:
-            _Buf << "Connection: close\r\n";
+            _connection = "Connection: close\r\n";
             break;
         case Http::HttpConnectionEnum::ProxyConnection:
-            _Buf << "Connection: proxy-connection\r\n";
+            _connection = "Connection: proxy-connection\r\n";
             break;
         case Http::HttpConnectionEnum::KeepAlive:
-            _Buf << "Connection: keep-alive\r\n";
+            _connection = "Connection: keep-alive\r\n";
             break;
         case Http::HttpConnectionEnum::Upgrade:
-            _Buf << "Connection: upgrade\r\n";
+            _connection = "Connection: upgrade\r\n";
             break;
         default:
             break;
@@ -41,37 +44,35 @@ void Bob::Http::Response::SetConnection(Bob::Http::HttpConnectionEnum connection
 
 void Bob::Http::Response::SetContentType(Bob::Http::ContentTypeEnum cType)
 {
-  if(haveContent == true) return;
-  haveContent = true;
     switch(cType)
     {
         case ContentTypeEnum::ApplicationJson:
-            _Buf << "Content-Type: application/json\r\n";
+            _contentType = "Content-Type: application/json\r\n";
             break;
         case ContentTypeEnum::ApplicationXml:
-            _Buf << "Content-Type: application/xml\r\n";
+            _contentType = "Content-Type: application/xml\r\n";
             break;
         case ContentTypeEnum::ApplicationOctetStream:
-            _Buf << "Content-Type: application/octet-stream\r\n";
+            _contentType = "Content-Type: application/octet-stream\r\n";
             break;
         case ContentTypeEnum::ImageJpeg:
-            _Buf << "Content-Type: image/jpeg\r\n";
+            _contentType = "Content-Type: image/jpeg\r\n";
             break;
         case ContentTypeEnum::ImagePng:
-            _Buf << "Content-Type: image/png\r\n";
+            _contentType = "Content-Type: image/png\r\n";
             break;
         case ContentTypeEnum::TextHtml:
-            _Buf << "Content-Type: text/html\r\n";
+            _contentType = "Content-Type: text/html\r\n";
             break;
         default:
             break;
     }
 }
 
-
 std::string Bob::Http::Response::_RawCodeToString()
 {
    switch (_RawCode) {
+    default: return "Unknown";
     case Http::HttpStatusEnum::Continue: return "100 Continue";
     case Http::HttpStatusEnum::SwitchingProtocols: return "101 Switching Protocols";
 
@@ -100,8 +101,24 @@ std::string Bob::Http::Response::_RawCodeToString()
     case Http::HttpStatusEnum::ServiceUnavailable: return "503 Service Unavailable";
     case Http::HttpStatusEnum::GatewayTimeout: return "504 Gateway Timeout";
 
-        default: return "Unknown";
     }
 }
 
+void Bob::Http::Response::SetBody(std::string body)
+{
+  _body = std::string(body);
+}
+
+std::string Bob::Http::Response::Send()
+{
+  std::string allBuffer;
+  allBuffer = _firstHeader;
+  allBuffer += _contentType;
+  allBuffer += _connection;
+  allBuffer += "Content-Length: " + std::to_string(_body.size()); 
+  allBuffer += "\r\n\r\n";
+  allBuffer += _body;
+  std::cout << "BUFFER:\r\n" << allBuffer << std::endl;
+  return allBuffer;
+}
 

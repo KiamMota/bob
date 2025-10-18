@@ -4,8 +4,7 @@
 #include "Enums.hpp"
 #include <string>
 
-namespace Bob
-{
+namespace Bob {
 namespace Http
 {
 

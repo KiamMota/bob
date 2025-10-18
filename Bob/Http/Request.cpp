@@ -1,4 +1,5 @@
 #include "Enums.hpp"
+#include "Request.hpp"
 #include <cstddef>
 #include <cstring>
 #include <string>

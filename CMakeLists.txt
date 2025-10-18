@@ -5,7 +5,7 @@ message("bob -> http server")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Adiciona libuv como subdiretório
-add_subdirectory(services/libuv)
+add_subdirectory(Services/libuv)
 
 set(BOB_SRC 
   Bob/Server/BobServer.cpp
@@ -22,7 +22,7 @@ target_link_libraries(bob PRIVATE uv_a)
 set(BOB_TST test/bob/main.cpp)
 add_executable(bob_test ${BOB_TST})
 
-target_include_directories(bob_test PRIVATE services/libuv/include Bob)
+target_include_directories(bob_test PRIVATE Services/libuv/include Bob)
 
 # Linkar com a libuv compilada local
 target_link_libraries(bob_test PRIVATE uv_a bob)

@@ -22,8 +22,8 @@ namespace Bob
       uv_timer_t* _timerHandle;
       uv_tcp_t* _serverHandle;
       uv_loop_t* _mainLoop;
-      const char* _messageNotAllowed;
 
+      const char* _messageNotAllowed;
       std::pmr::unordered_map<std::string /* route */, 
           std::pmr::unordered_map<Http::HttpMethod, std::function<Http::Response(Http::Request&)>>> _RouteMap;
 

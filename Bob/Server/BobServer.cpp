@@ -4,8 +4,8 @@
 #include "Http/Response.hpp"
 #include "uv.h"
 #include "uv/unix.h"
-#include <cstdio>
 #include <cstring>
+#include <cstdio>
 #include <iostream>
 #include <string>
 #include <sys/socket.h>
@@ -15,7 +15,7 @@ Bob::BobServer::BobServer(const char* ip, ushort port)
 {
   _Ip = ip;
   _Port = port;
-  _messageNotAllowed = "HTTP/1.1 405 Method Not Allowed\r\n Server: Bob\r\n";
+  _messageNotAllowed = "HTTP/1.1 405 Method Not Allowed\r\nServer: Bob\r\n";
 }
 
 int Bob::BobServer::Run()
@@ -94,10 +94,8 @@ void Bob::BobServer::WriteCb(uv_write_t* write, int status)
 
 void Bob::BobServer::ReadBufferCb(uv_stream_t* server, ssize_t nread, const uv_buf_t* buffer) {
     
-    std::cout << "* Reading Data..." << std::endl;  
-
     BobServer* self = (BobServer*)server->data;
-
+    std::cout << "* Reading Data..." << std::endl;  
     if(!self)
     {
       std::cout << "Failed To Alocate self in stream->data" << std::endl;
@@ -105,14 +103,17 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* server, ssize_t nread, const uv_b
       return;
     };
 
-    if(nread <= 0) {
-        if(nread == UV_EOF) std::cout << "* Stream Disconnected\n";
-        else std::cout << "* No Data\n";
-        if(buffer->base) delete[] buffer->base;
-        if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)server))
-            uv_close((uv_handle_t*)server, nullptr);
-        return;
+    if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)server))
+    {
+      uv_close((uv_handle_t*)server, nullptr);
+      return;
     }
+
+    uv_write_t* writer = new uv_write_t;
+    uv_buf_t responseBuf;
+    char* messageNotAllowed = strdup(self->_messageNotAllowed);
+    responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
+    uv_write(writer, server, &responseBuf, 1, WriteCb);
     delete[] buffer->base;
 }
 

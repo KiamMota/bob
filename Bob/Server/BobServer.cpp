@@ -104,12 +104,6 @@ void Bob::BobServer::AllocBufferCb(uv_handle_t* handle, size_t suggested_size, u
     buffer->base = new char[buffer->len];
 }
 
-Bob::BobServer& Bob::BobServer::SetIdleTimeout(int ms)
-{
- _msTolerance = ms; 
-  return *this;
-}
-
 void Bob::BobServer::WriteCb(uv_write_t* write, int status)
 {
   if(status < 0) std::cout << "error:" << uv_strerror(status); 

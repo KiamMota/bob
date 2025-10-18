@@ -17,7 +17,6 @@ namespace Bob
   class BobServer
   { 
     private:
-      int _msTolerance;
       std::string _Ip;
       ushort _Port;
       uv_timer_t* _timerHandle;
@@ -48,7 +47,6 @@ namespace Bob
       
       BobServer& AddController(const char* route, Http::HttpMethodEnum Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback);
       
-      BobServer& SetIdleTimeout(int ms);
       ushort GetPort();
       std::string GetIp();
       std::string GetEndpoint();

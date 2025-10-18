@@ -4,6 +4,7 @@
 #include "Http/Response.hpp"
 #include "uv.h"
 #include "uv/unix.h"
+#include <cstddef>
 #include <cstring>
 #include <cstdio>
 #include <iostream>
@@ -72,10 +73,10 @@ void Bob::BobServer::AllocBufferCb(uv_handle_t* handle, size_t suggested_size, u
 {
     if(suggested_size <= 0)
     {
-      std::cout << "No Data";
+      std::cout << "* No Data " << std::endl;
       suggested_size = 1024;
+      std::cout << "* Adjusted Size " << std::endl;
     }
-    std::cout << "* Allocated Buffer " << std::endl;
     buffer->len = suggested_size;
     buffer->base = new char[buffer->len];
 }
@@ -106,14 +107,21 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* server, ssize_t nread, const uv_b
     if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)server))
     {
       uv_close((uv_handle_t*)server, nullptr);
+      delete[] buffer->base;
       return;
     }
 
     uv_write_t* writer = new uv_write_t;
     uv_buf_t responseBuf;
+    
     char* messageNotAllowed = strdup(self->_messageNotAllowed);
+    
     responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));
+    
     uv_write(writer, server, &responseBuf, 1, WriteCb);
+    
+    uv_close((uv_handle_t*)server, NULL);
+    
     delete[] buffer->base;
 }
 
@@ -126,14 +134,12 @@ void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
     uv_tcp_t* client_handle = new uv_tcp_t;
     uv_tcp_init(self->_mainLoop, client_handle);
 
+    client_handle->data = self; // agora ReadBufferCb pode acessar 'self'
     if (uv_accept(stream, (uv_stream_t*)client_handle) != 0) {
-        uv_close((uv_handle_t*)client_handle, [](uv_handle_t* h){ delete (uv_tcp_t*)h; });
         std::cout << "* Not Accepted Connection! " << std::endl;
+        uv_close((uv_handle_t*)client_handle, [](uv_handle_t* h){ delete (uv_tcp_t*)h; });
         return;
     }
-
-    // *** CORREÇÃO CRÍTICA ***
-    client_handle->data = self; // agora ReadBufferCb pode acessar 'self'
 
     uv_timer_t* timeoutTimer = new uv_timer_t;
     uv_timer_init(self->_mainLoop, timeoutTimer);

@@ -5,6 +5,7 @@
 #include "Http/Request.hpp"
 #include "Http/Response.hpp"
 #include "uv.h"
+#include "uv/unix.h"
 #include <functional>
 #include <netinet/in.h>
 #include <string>
@@ -23,9 +24,10 @@ namespace Bob
       uv_tcp_t* _serverHandle;
       uv_loop_t* _mainLoop;
 
+      std::unordered_map<std::string /* route */, std::unordered_map<Http::HttpMethodEnum,
+              std::function<Http::Response(Http::Request&)>>> _routeMap;   
+
       const char* _messageNotAllowed;
-      std::pmr::unordered_map<std::string /* route */, 
-          std::pmr::unordered_map<Http::HttpMethod, std::function<Http::Response(Http::Request&)>>> _RouteMap;
 
       struct sockaddr_in address;
       /* necessary to alloc buffer to response */ 
@@ -36,8 +38,7 @@ namespace Bob
       static void WriteCb(uv_write_t* req, int status);    
       /* default callback connection */
       static void DefaultCallbackConnection(uv_stream_t* stream, int result);
-      /* to send response */
-      static void SendResponse(uv_stream_t* client);
+      static void SendResponse(uv_stream_t* client, const uv_buf_t* buffer);
       void PrepareServer();
       void InfoListening();
       void InitLoop();
@@ -45,7 +46,7 @@ namespace Bob
       BobServer(const char* ip, ushort port); 
       int Run(); 
       
-      BobServer& AddController(const char* route, Bob::Http::HttpMethod Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback);
+      BobServer& AddController(const char* route, Http::HttpMethodEnum Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback);
       
       BobServer& SetIdleTimeout(int ms);
       ushort GetPort();

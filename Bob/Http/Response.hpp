@@ -15,14 +15,14 @@ namespace Bob
         std::string _ServerName;
         std::string _Date;
         std::ostringstream _Buf;
-        Bob::Http::HttpStatus _RawCode;
+        Bob::Http::HttpStatusEnum _RawCode;
         std::string _Code;
         void _StartHeaders();
         std::string _RawCodeToString();
       public:
   
         Response(int Code);
-        Response(Bob::Http::HttpStatus Code);
+        Response(Bob::Http::HttpStatusEnum Code);
 
         Response& SetContentType();
         Response& SetConnection();

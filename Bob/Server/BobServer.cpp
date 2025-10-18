@@ -11,6 +11,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <uv.h>
+#include <uv/unix.h>
 
 Bob::BobServer::BobServer(const char* ip, ushort port)
 {
@@ -27,9 +28,8 @@ int Bob::BobServer::Run()
   return uv_run(_mainLoop, UV_RUN_DEFAULT);
 }
 
-Bob::BobServer& Bob::BobServer::AddController(const char* route, Bob::Http::HttpMethod Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback)
+Bob::BobServer& Bob::BobServer::AddController(const char* route, Bob::Http::HttpMethodEnum Method, std::function<Bob::Http::Response(Bob::Http::Request&)> callback)
 {
-  _RouteMap[route][Method] = callback; 
   return *this;
 }
 
@@ -127,11 +127,11 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* client, ssize_t nread, const uv_b
     }
 
     std::cout << "* Received Data" << std::endl;
-    SendResponse(client);  
+    SendResponse(client, buffer);  
     delete[] buffer->base;
 }
 
-void Bob::BobServer::SendResponse(uv_stream_t* client)
+void Bob::BobServer::SendResponse(uv_stream_t* client, const uv_buf_t* buffer)
 {
     /* inits the self object */
     BobServer* self = (BobServer*)client->data;
@@ -146,6 +146,9 @@ void Bob::BobServer::SendResponse(uv_stream_t* client)
       delete writer;
       return;
     };
+
+    Http::Request req(buffer->base);
+
 
     char* messageNotAllowed = strdup(self->_messageNotAllowed);
     responseBuf = uv_buf_init(messageNotAllowed, strlen(messageNotAllowed));

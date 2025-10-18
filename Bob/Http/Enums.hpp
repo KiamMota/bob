@@ -7,7 +7,7 @@ namespace Bob
   namespace Http
   {
 
-    enum class HttpMethod 
+    enum class HttpMethodEnum 
     {
       GET = 1,
       POST,
@@ -17,7 +17,7 @@ namespace Bob
       UNKNOWN  
     };
 
-    enum class ContentType
+    enum class ContentTypeEnum
     {
       TextPlain = 1,
       TextHtml,
@@ -30,7 +30,7 @@ namespace Bob
       UnknownOrEmpty
     };
     
-    enum class HttpStatus {
+    enum class HttpStatusEnum {
       Continue = 100,
       SwitchingProtocols = 101,
 

@@ -22,7 +22,7 @@ namespace Http
     std::string _route;
     std::string _httpVersion;
     std::string _host;
-      
+    std::string _body;   
      
 
     public:
@@ -33,8 +33,8 @@ namespace Http
     std::string Host();
     std::string Version();
     std::string Route();
-    std::string ContentType();
-    std::string ContentLength();
+    Bob::Http::ContentTypeEnum ContentType();
+    uint64_t ContentLength();
     void DeserializeAll(); 
 };
 }

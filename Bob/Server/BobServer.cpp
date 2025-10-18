@@ -69,6 +69,28 @@ void Bob::BobServer::InitLoop()
   _mainLoop = uv_default_loop();
 }
 
+void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
+{
+    /* data to get the object */
+    BobServer* self = (BobServer*)stream->data;
+    std::cout << "* Client Connected" << std::endl;
+
+    /* represents the client */
+    uv_tcp_t* client_handle = new uv_tcp_t;
+    
+    uv_tcp_init(self->_mainLoop, client_handle);
+  
+    client_handle->data = self;
+    /* if connection is not accepted */
+    if (uv_accept(stream, (uv_stream_t*)client_handle) != 0) {
+        std::cout << "* Not Accepted Connection! " << std::endl;
+        uv_close((uv_handle_t*)client_handle, [](uv_handle_t* h){ delete (uv_tcp_t*)h; });
+        return;
+    }
+   
+    uv_read_start((uv_stream_t*)client_handle, self->AllocBufferCb, self->ReadBufferCb);
+}
+
 void Bob::BobServer::AllocBufferCb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buffer)
 {
     if(suggested_size <= 0)
@@ -98,19 +120,20 @@ void Bob::BobServer::ReadBufferCb(uv_stream_t* client, ssize_t nread, const uv_b
     
     if(nread == UV_EOF && !uv_is_closing((uv_handle_t*)client))
     {
+      std::cout << "* Closing Client Connection " << std::endl;
       uv_close((uv_handle_t*)client, nullptr);
       delete[] buffer->base;
       return;
     }
 
     std::cout << "* Received Data" << std::endl;
-
     SendResponse(client);  
     delete[] buffer->base;
 }
 
 void Bob::BobServer::SendResponse(uv_stream_t* client)
 {
+    /* inits the self object */
     BobServer* self = (BobServer*)client->data;
     std::cout << "* Sending Response" << std::endl;
     uv_write_t* writer = new uv_write_t;
@@ -119,6 +142,8 @@ void Bob::BobServer::SendResponse(uv_stream_t* client)
     if(!self)
     {
       std::cout << "Failed To Alocate self in stream->data" << std::endl;
+      delete self;
+      delete writer;
       return;
     };
 
@@ -128,22 +153,4 @@ void Bob::BobServer::SendResponse(uv_stream_t* client)
     uv_close((uv_handle_t*)client, NULL);
 }
 
-void Bob::BobServer::DefaultCallbackConnection(uv_stream_t* stream, int status)
-{
-    BobServer* self = static_cast<BobServer*>(stream->data);
-    std::cout << "* Stream Connected : " << std::flush;
-
-    uv_tcp_t* client_handle = new uv_tcp_t;
-    uv_tcp_init(self->_mainLoop, client_handle);
-
-    client_handle->data = self; // agora ReadBufferCb pode acessar 'self'
-    if (uv_accept(stream, (uv_stream_t*)client_handle) != 0) {
-        std::cout << "* Not Accepted Connection! " << std::endl;
-        uv_close((uv_handle_t*)client_handle, [](uv_handle_t* h){ delete (uv_tcp_t*)h; });
-        return;
-    }
-    
-    uv_read_start((uv_stream_t*)client_handle, self->AllocBufferCb, self->ReadBufferCb);
-
-}
 

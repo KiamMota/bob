@@ -28,11 +28,15 @@ namespace Bob
           std::pmr::unordered_map<Http::HttpMethod, std::function<Http::Response(Http::Request&)>>> _RouteMap;
 
       struct sockaddr_in address;
-  
+      /* necessary to alloc buffer to response */ 
       static void AllocBufferCb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buffer);
+      /* when data comes */
       static void ReadBufferCb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buffer);
+      /* callback to alloc writer */
       static void WriteCb(uv_write_t* req, int status);    
+      /* default callback connection */
       static void DefaultCallbackConnection(uv_stream_t* stream, int result);
+      /* to send response */
       static void SendResponse(uv_stream_t* client);
       void PrepareServer();
       void InfoListening();

@@ -1,4 +1,3 @@
-#include "Request.hpp"
 #include "Enums.hpp"
 #include <cstddef>
 #include <cstring>
@@ -140,52 +139,52 @@ void Bob::Http::Request::ContentTypeDeserialize()
   size_t pos = _AllBuff.find("Content-Type");
   if(pos == std::string::npos)
   {
-    _ContentType = Http::ConentType::UnknownOrEmpty;
+    _ContentType = Http::ContentType::UnknownOrEmpty;
     return;
   }
   std::string contentType = _AllBuff.substr(pos + strlen("Content-Type"));
 
   if(contentType == "text/plain")
   {
-    _ContentType = Http::ConentType::TextPlain;
+    _ContentType = Http::ContentType::TextPlain;
     return;
   }
   if(contentType == "text/html")
   {
-    _ContentType = Http::ConentType::TextHtml;
+    _ContentType = Http::ContentType::TextHtml;
     return;
   }
   if(contentType == "application/json")
   {
-    _ContentType = Http::ConentType::ApplicationJson;
+    _ContentType = Http::ContentType::ApplicationJson;
     return;
   }
   if(contentType == "application/xml")
   {
-    _ContentType = Http::ConentType::ApplicationXml;
+    _ContentType = Http::ContentType::ApplicationXml;
     return;
   }
   if(contentType == "application/octet-stream")
   {
-    _ContentType = Http::ConentType::ApplicationOctetStream;
+    _ContentType = Http::ContentType::ApplicationOctetStream;
     return;
   }
   if(contentType == "image/png")
   {
-    _ContentType = Http::ConentType::ImagePng;
+    _ContentType = Http::ContentType::ImagePng;
     return;
   }
   if(contentType == "image/jpeg")
   {
-    _ContentType = Http::ConentType::ImageJpeg;
+    _ContentType = Http::ContentType::ImageJpeg;
     return;
   }
   if(contentType == "multipart/form-data")
   {
-    _ContentType = Http::ConentType::MultipartFormData;
+    _ContentType = Http::ContentType::MultipartFormData;
     return;
   }
-  _ContentType = Http::ConentType::UnknownOrEmpty;
+  _ContentType = Http::ContentType::UnknownOrEmpty;
 }
 
 void Bob::Http::Request::ContentLengthDeserialize()

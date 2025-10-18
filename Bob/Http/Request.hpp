@@ -18,14 +18,14 @@ namespace Http
     std::string _Route;
     std::string _HttpVersion;
     std::string _Host;
-    Bob::Http::ConentType _ContentType;
+    Bob::Http::ContentType _ContentType;
     long _ContentLength;
     public:
     Request(const std::string& Buffer);
     Request(const char* Buffer);
     std::string& operator[](const std::string& getter);
     Http::HttpMethod GetMethod();
-    Http::ConentType GetContentType();
+    Http::ContentType GetContentType();
     void HeaderDeserializer();
     void MethodDeserializer();
     void RouteDeserializer();

@@ -1,6 +1,7 @@
 #ifndef _HTTP_ENUMS_HPP
 #define _HTTP_ENUMS_HPP
 
+
 namespace Bob
 {
   namespace Http
@@ -16,7 +17,7 @@ namespace Bob
       UNKNOWN  
     };
 
-    enum class ConentType
+    enum class ContentType
     {
       TextPlain = 1,
       TextHtml,
